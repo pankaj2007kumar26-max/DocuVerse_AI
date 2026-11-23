@@ -1,0 +1,21 @@
+# ==========================================
+# DocuVerse AI - Dependencies
+# ==========================================
+
+# Modern Web UI Framework
+streamlit>=1.35.0
+
+# Fast PDF Text & Page Extraction
+PyMuPDF>=1.24.0
+
+# FAISS (Facebook AI Similarity Search) - CPU Version
+faiss-cpu>=1.8.0
+
+# HTTP REST Client for Groq API
+requests>=2.31.0
+
+# Secure Environment Variables (.env file reader)
+python-dotenv>=1.0.1
+
+# Numerical computations for vector normalization
+numpy>=1.24.0

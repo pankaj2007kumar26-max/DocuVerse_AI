@@ -1,0 +1,28 @@
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Secret Environment variables (CRITICAL: Never upload .env to GitHub)
+.env
+*.env
+!.env.example
+
+# Temporary user uploads and stored vector files
+temp_uploads/
+faiss_index/
+*.faiss
+*.pkl
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

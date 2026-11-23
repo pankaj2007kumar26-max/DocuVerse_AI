@@ -1,0 +1,13 @@
+[theme]
+base = "dark"
+primaryColor = "#7957ee"
+backgroundColor = "#090b20"
+secondaryBackgroundColor = "#171a35"
+textColor = "#f7f8ff"
+borderColor = "#303760"
+baseRadius = "12px"
+buttonRadius = "10px"
+showWidgetBorder = true
+showSidebarBorder = true
+paddingTop = "0rem"
+paddingBottom = "1rem"
