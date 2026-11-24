@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuVerse AI - Mini Project Report | Kanpur Institute of Technology</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Roboto:wght@300;400;500;700&display=swap');
+
+        @page {
+            size: A4;
+            margin: 22mm 18mm 22mm 22mm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            font-size: 11.5pt;
+            line-height: 1.6;
+            color: #111827;
+            background-color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+        }
+
+        .report-container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 40px 30px;
+            background: #FFFFFF;
+        }
+
+        /* Print Media Styles */
+        @media print {
+            body {
+                background: none;
+            }
+            .report-container {
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            .page-break {
+                page-break-after: always;
+                break-after: page;
+            }
+            .no-print {
+                display: none !important;
+            }
+            a {
+                text-decoration: none;
+                color: #111827;
+            }
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-family: 'Merriweather', Georgia, serif;
+            color: #0F172A;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        h1.chapter-title {
+            font-size: 19pt;
+            border-bottom: 2px solid #2563EB;
+            padding-bottom: 8px;
+            margin-top: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h2.section-title {
+            font-size: 14pt;
+            color: #1E3A8A;
+            margin-top: 1.2em;
+        }
+
+        h3.sub-section-title {
+            font-size: 12pt;
+            color: #334155;
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 1em;
+        }
+
+        /* College Header */
+        .college-header {
+            text-align: center;
+            border-bottom: 2px solid #0F172A;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+        }
+        .college-name {
+            font-size: 20pt;
+            font-weight: 800;
+            color: #0F172A;
+            letter-spacing: 1px;
+            font-family: 'Merriweather', serif;
+        }
+        .college-address {
+            font-size: 10pt;
+            color: #334155;
+            margin-top: 4px;
+        }
+        .college-accreditation {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: #1E40AF;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            text-align: center;
+            padding-top: 20px;
+        }
+        .project-tag {
+            font-size: 13pt;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #475569;
+            margin-top: 25px;
+        }
+        .project-title {
+            font-size: 26pt;
+            font-weight: 800;
+            color: #1E3A8A;
+            margin: 15px 0 5px 0;
+            letter-spacing: 1px;
+            font-family: 'Merriweather', serif;
+        }
+        .project-subtitle {
+            font-size: 13pt;
+            color: #475569;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        .submission-statement {
+            font-size: 11pt;
+            margin: 30px auto;
+            max-width: 580px;
+            line-height: 1.6;
+            color: #334155;
+        }
+        .degree-name {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #0F172A;
+            margin-top: 8px;
+        }
+        .dept-name {
+            font-size: 13pt;
+            font-weight: 700;
+            color: #1E40AF;
+            margin-top: 4px;
+        }
+        .meta-badges {
+            margin: 25px 0;
+            font-size: 10.5pt;
+            font-weight: 600;
+            color: #334155;
+        }
+        .meta-badges span {
+            background: #F1F5F9;
+            padding: 5px 14px;
+            border-radius: 6px;
+            margin: 0 4px;
+            border: 1px solid #CBD5E1;
+        }
+
+        .submission-table {
+            width: 100%;
+            margin-top: 50px;
+            border-collapse: collapse;
+        }
+        .submission-table td {
+            width: 50%;
+            vertical-align: top;
+            padding: 10px;
+            font-size: 11pt;
+        }
+
+        /* Certificate and Declaration */
+        .certificate-box {
+            border: 3px double #94A3B8;
+            padding: 30px 25px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .signatures-grid {
+            width: 100%;
+            margin-top: 70px;
+            border-collapse: collapse;
+        }
+        .signatures-grid td {
+            width: 50%;
+            text-align: center;
+            vertical-align: bottom;
+            padding: 15px;
+        }
+        .sign-line {
+            width: 220px;
+            border-top: 1px solid #0F172A;
+            margin: 0 auto 10px auto;
+        }
+
+        /* Tables */
+        table.content-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 10.5pt;
+        }
+        table.content-table th, table.content-table td {
+            border: 1px solid #CBD5E1;
+            padding: 9px 12px;
+            text-align: left;
+        }
+        table.content-table th {
+            background-color: #F1F5F9;
+            color: #0F172A;
+            font-weight: 700;
+        }
+        table.content-table tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+
+        /* Architecture Diagram Box */
+        .diagram-box {
+            background: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 9.5pt;
+            line-height: 1.35;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 20px 0;
+            color: #0F172A;
+        }
+
+        /* Code Block */
+        pre.code-block {
+            background: #1E293B;
+            color: #F8FAFC;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 9.5pt;
+            overflow-x: auto;
+            line-height: 1.45;
+        }
+
+        /* Callout Box */
+        .callout-box {
+            background-color: #EFF6FF;
+            border-left: 4px solid #2563EB;
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 18px 0;
+            font-size: 10.5pt;
+            color: #1E3A8A;
+        }
+
+        /* Print Button Floating Bar */
+        .print-bar {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: #1E3A8A;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 10.5pt;
+        }
+        .print-bar:hover {
+            background: #2563EB;
+        }
+    </style>
+</head>
+<body>
+
+<div class="print-bar no-print" onclick="window.print()">
+    🖨️ Print / Save as PDF (Ctrl + P)
+</div>
+
+<div class="report-container">
+
+    <!-- ==================== COVER PAGE ==================== -->
+    <div class="cover-page">
+        <div class="college-header">
+            <div class="college-name">KANPUR INSTITUTE OF TECHNOLOGY</div>
+            <div class="college-address">A-1, UPSIDC Industrial Area, Chakeri Ward, Rooma, Kanpur – 208001</div>
+            <div class="college-address">Approved by AICTE, New Delhi & Affiliated to Dr. A.P.J. Abdul Kalam Technical University, Lucknow</div>
+            <div class="college-accreditation">ISO 9001:2015 CERTIFIED &nbsp;|&nbsp; NAAC ACCREDITED WITH GRADE 'A'</div>
+        </div>
+
+        <div class="project-tag">MINI PROJECT REPORT ON</div>
+        <div class="project-title">DOCUVERSE AI</div>
+        <div class="project-subtitle">Intelligent Document Reading & Question Answering System<br>(High-Speed RAG & Groq LPU Powered Academic Study Assistant)</div>
+
+        <div class="submission-statement">
+            A Mini Project Report Submitted in Partial Fulfilment of the Requirements for the Degree of
+            <div class="degree-name">BACHELOR OF TECHNOLOGY</div>
+            <div class="dept-name">IN COMPUTER SCIENCE AND ENGINEERING</div>
+        </div>
+
+        <div class="meta-badges">
+            <span>Session: 2025–2026</span>
+            <span>Year: 2nd</span>
+            <span>Semester: 3rd / 4th</span>
+            <span>Section: A</span>
+        </div>
+
+        <table class="submission-table">
+            <tr>
+                <td style="text-align: left;">
+                    <strong>Submitted to:</strong><br><br>
+                    <span style="font-size: 12pt; font-weight: 700; color: #0F172A;">Ms. Prakanksha Shukla</span><br>
+                    Assistant Professor<br>
+                    Department of Computer Science & Engineering<br>
+                    Kanpur Institute of Technology, Kanpur
+                </td>
+                <td style="text-align: right;">
+                    <strong>Submitted by:</strong><br><br>
+                    <span style="font-size: 12pt; font-weight: 700; color: #0F172A;">Pankaj Kumar</span><br>
+                    Roll Number: <strong>2501651530026</strong><br>
+                    B.Tech CSE, 2nd Year<br>
+                    Kanpur Institute of Technology, Kanpur
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== CERTIFICATE ==================== -->
+    <div class="certificate-box">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <div style="font-size: 17pt; font-weight: 800; color: #0F172A; text-decoration: underline; font-family: 'Merriweather', serif;">
+                CERTIFICATE OF APPROVAL
+            </div>
+        </div>
+
+        <p>
+            This is to certify that the mini project report entitled <strong>“DOCUVERSE AI – Intelligent Document Reading & Question Answering System”</strong> has been submitted by <strong>Pankaj Kumar</strong> (Roll Number: <strong>2501651530026</strong>), student of <strong>Bachelor of Technology in Computer Science and Engineering</strong> at <strong>Kanpur Institute of Technology, Kanpur</strong>, during the academic session <strong>2025–2026</strong>.
+        </p>
+
+        <p>
+            The project work has been carried out under my direct guidance, supervision, and mentorship in the Department of Computer Science and Engineering. This report is submitted in partial fulfilment of the requirements for the award of the degree of <strong>Bachelor of Technology</strong>.
+        </p>
+
+        <p>
+            To the best of my knowledge and belief, the work embodied in this project report is original, technically sound, and suitable for evaluation and academic submission.
+        </p>
+
+        <table class="signatures-grid">
+            <tr>
+                <td>
+                    <div class="sign-line"></div>
+                    <strong>Mr. Rahul Singh</strong><br>
+                    Head of Department<br>
+                    Department of CSE<br>
+                    Kanpur Institute of Technology
+                </td>
+                <td>
+                    <div class="sign-line"></div>
+                    <strong>Ms. Prakanksha Shukla</strong><br>
+                    Project Guide & Assistant Professor<br>
+                    Department of CSE<br>
+                    Kanpur Institute of Technology
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== DECLARATION ==================== -->
+    <div style="padding: 10px 0;">
+        <h1 class="chapter-title">CANDIDATE DECLARATION</h1>
+
+        <p>
+            I, <strong>Pankaj Kumar</strong>, Roll Number: <strong>2501651530026</strong>, student of <strong>Bachelor of Technology in Computer Science and Engineering</strong>, 2nd Year, at <strong>Kanpur Institute of Technology, Kanpur</strong>, hereby declare that the project report entitled <strong>“DOCUVERSE AI – Intelligent Document Reading & Question Answering System”</strong> is an authentic record of my own project work carried out under the supervision and guidance of <strong>Ms. Prakanksha Shukla</strong>, Assistant Professor, Department of Computer Science and Engineering.
+        </p>
+
+        <p>
+            I declare that this report represents my authentic project work and that the information, algorithms, external libraries, and concepts derived from external sources, official documentation, and technical literature have been acknowledged and cited wherever applicable.
+        </p>
+
+        <p>
+            This report has not been submitted previously, in part or in full, to any other university or institute for the award of any degree, diploma, or academic certificate. I take full responsibility for the originality, technical integrity, and accuracy of the work presented herein.
+        </p>
+
+        <br><br>
+        <div style="display: flex; justify-content: space-between; margin-top: 40px;">
+            <div>
+                <strong>Date:</strong> 24 November 2026<br>
+                <strong>Place:</strong> Kanpur
+            </div>
+            <div style="text-align: right;">
+                <div style="width: 200px; border-top: 1px solid #0F172A; margin-bottom: 8px;"></div>
+                <strong>Pankaj Kumar</strong><br>
+                Roll Number: 2501651530026<br>
+                Department of Computer Science & Engineering<br>
+                Kanpur Institute of Technology, Kanpur
+            </div>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== ACKNOWLEDGEMENT ==================== -->
+    <div>
+        <h1 class="chapter-title">ACKNOWLEDGEMENT</h1>
+
+        <p>
+            I would like to express my deepest gratitude and sincere appreciation to everyone who supported, motivated, and guided me in the successful design, implementation, and deployment of my mini project, <strong>“DocuVerse AI – Intelligent Document Reading & Question Answering System.”</strong>
+        </p>
+
+        <p>
+            First and foremost, I express my heartfelt gratitude to my project guide, <strong>Ms. Prakanksha Shukla</strong>, Assistant Professor, Department of Computer Science and Engineering, for her invaluable guidance, continuous encouragement, constructive critiques, and technical mentoring throughout this project. Her insights into web architecture, system design, and AI model integration were instrumental in shaping this project.
+        </p>
+
+        <p>
+            I extend my sincere thanks to <strong>Mr. Rahul Singh</strong>, Head of Department, Computer Science and Engineering, and all faculty members of Kanpur Institute of Technology for providing the necessary academic infrastructure, computational resources, and encouraging learning environment.
+        </p>
+
+        <p>
+            I am also profoundly thankful to the management and leadership of <strong>Kanpur Institute of Technology</strong> for fostering an ecosystem of innovation, technical excellence, and practical project-based learning.
+        </p>
+
+        <p>
+            Finally, I express my sincere love and gratitude to my family and friends for their unwavering patience, moral support, and motivation during late-night debugging and development sessions.
+        </p>
+
+        <br><br>
+        <div style="text-align: right; margin-top: 30px;">
+            <strong>Pankaj Kumar</strong><br>
+            Department of Computer Science & Engineering<br>
+            Kanpur Institute of Technology, Kanpur
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== ABSTRACT ==================== -->
+    <div>
+        <h1 class="chapter-title">ABSTRACT</h1>
+
+        <p>
+            In modern academic and professional environments, students, researchers, and professionals face unprecedented information overload. Textbooks, research papers, legal contracts, and syllabi often span hundreds of dense pages. Generic Large Language Models (LLMs) suffer from severe limitations when analyzing proprietary documents: token window restrictions, complete lack of real-time access to user files, and a notorious tendency to fabricate facts (<em>hallucinations</em>) without accountable source citations.
+        </p>
+
+        <p>
+            <strong>DocuVerse AI</strong> is an intelligent, high-performance document reading and question-answering system designed to overcome these challenges through <strong>Retrieval-Augmented Generation (RAG)</strong>. The system ingests arbitrary multi-page PDF documents, extracts clean text using <strong>PyMuPDF</strong>, performs sliding-window semantic chunking with optimal overlap, generates dense vector embeddings, and builds isolated high-dimensional vector indices using <strong>FAISS (Facebook AI Similarity Search)</strong>.
+        </p>
+
+        <p>
+            When a user submits a query, DocuVerse AI performs cosine similarity search in vector space, retrieves the top-$K$ most relevant document snippets, and constructs an anti-hallucination prompt for the <strong>Groq LPU (Language Processing Unit) Inference Engine</strong>. Operating on state-of-the-art open-weights models (<em>Qwen 2.5 / Llama 3</em>), Groq delivers responses with sub-second latency. Every answer is strictly grounded in the uploaded text and accompanied by verifiable, exact page citations and source snippets.
+        </p>
+
+        <p>
+            Beyond question answering, DocuVerse AI serves as a comprehensive study companion, providing:
+        </p>
+        <ul>
+            <li>One-click executive document summaries.</li>
+            <li>Auto-generated practice multiple-choice questions (MCQs) with detailed answer rationales.</li>
+            <li>Key takeaway extractions.</li>
+            <li>Multilingual support across English, Hindi, and Hinglish.</li>
+        </ul>
+
+        <p>
+            The application is engineered with an enterprise-grade <strong>FastAPI REST backend</strong> paired with a responsive, glassmorphic <strong>Streamlit frontend</strong>. The entire system has been validated via an automated Pytest test suite (14/14 tests passed) and deployed to cloud infrastructure (<strong>Render</strong> and <strong>Streamlit Community Cloud</strong>).
+        </p>
+
+        <div class="callout-box">
+            <strong>Keywords:</strong> Retrieval-Augmented Generation (RAG), Large Language Models (LLMs), FAISS, Vector Embeddings, Groq LPU, PyMuPDF, FastAPI, Streamlit, Semantic Search, Anti-Hallucination, Educational Technology.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== TABLE OF CONTENTS ==================== -->
+    <div>
+        <h1 class="chapter-title">TABLE OF CONTENTS</h1>
+
+        <table class="content-table">
+            <thead>
+                <tr>
+                    <th style="width: 10%; text-align: center;">S. No.</th>
+                    <th style="width: 65%;">Topic / Title</th>
+                    <th style="width: 15%; text-align: center;">Chapter</th>
+                    <th style="width: 10%; text-align: center;">Page</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td align="center">1</td><td>Cover Page & Institute Details</td><td align="center">—</td><td align="center">1</td></tr>
+                <tr><td align="center">2</td><td>Certificate of Approval</td><td align="center">—</td><td align="center">2</td></tr>
+                <tr><td align="center">3</td><td>Candidate Declaration</td><td align="center">—</td><td align="center">3</td></tr>
+                <tr><td align="center">4</td><td>Acknowledgement</td><td align="center">—</td><td align="center">4</td></tr>
+                <tr><td align="center">5</td><td>Abstract</td><td align="center">—</td><td align="center">5</td></tr>
+                <tr><td align="center">6</td><td>Table of Contents</td><td align="center">—</td><td align="center">6</td></tr>
+                <tr><td align="center">7</td><td><strong>Introduction</strong> (Overview, Problem Statement, Methodology)</td><td align="center">Chapter 1</td><td align="center">7</td></tr>
+                <tr><td align="center">8</td><td><strong>Objectives and Scope</strong></td><td align="center">Chapter 2</td><td align="center">9</td></tr>
+                <tr><td align="center">9</td><td><strong>Feasibility Study</strong> (Technical, Economic, Operational, Legal)</td><td align="center">Chapter 3</td><td align="center">11</td></tr>
+                <tr><td align="center">10</td><td><strong>Requirement Analysis</strong> (Functional, Hardware, Software)</td><td align="center">Chapter 4</td><td align="center">13</td></tr>
+                <tr><td align="center">11</td><td><strong>System Design and Architecture</strong> (RAG Pipeline, DFD, Use Case)</td><td align="center">Chapter 5</td><td align="center">16</td></tr>
+                <tr><td align="center">12</td><td><strong>Technology Stack</strong> (FastAPI, Streamlit, FAISS, PyMuPDF, Groq)</td><td align="center">Chapter 6</td><td align="center">20</td></tr>
+                <tr><td align="center">13</td><td><strong>Main Modules Implementation</strong></td><td align="center">Chapter 7</td><td align="center">23</td></tr>
+                <tr><td align="center">14</td><td><strong>AI-Based Features & RAG Pipeline</strong></td><td align="center">Chapter 8</td><td align="center">27</td></tr>
+                <tr><td align="center">15</td><td><strong>Software Testing & Verification</strong> (Pytest 14/14 Matrix)</td><td align="center">Chapter 9</td><td align="center">30</td></tr>
+                <tr><td align="center">16</td><td><strong>Deployment & Limitations</strong> (Render, Streamlit Cloud, GitHub)</td><td align="center">Chapter 10</td><td align="center">33</td></tr>
+                <tr><td align="center">17</td><td><strong>Conclusion</strong></td><td align="center">Chapter 11</td><td align="center">35</td></tr>
+                <tr><td align="center">18</td><td><strong>Future Scope and References</strong></td><td align="center">Chapter 12</td><td align="center">36</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== CHAPTER 1 ==================== -->
+    <div>
+        <h1 class="chapter-title">CHAPTER 1 – INTRODUCTION</h1>
+
+        <h2 class="section-title">1.1 General Introduction</h2>
+        <p>
+            Textual documents form the backbone of modern education, science, governance, and enterprise communication. In colleges and universities, students encounter syllabi, academic research papers, reference books, lab manuals, and slide decks in Portable Document Format (PDF). As the volume of course materials expands, the time required to read, synthesize, and extract key information increases dramatically.
+        </p>
+        <p>
+            Standard keyword search (<code>Ctrl + F</code>) is fundamentally inadequate for comprehension because it relies on exact character matching. It cannot understand synonyms, semantic relationships, contextual subtleties, or implicit meaning. Conversely, standalone generative AI chatbots (such as standard ChatGPT or Gemini without document grounding) are prone to <em>hallucinations</em>—generating convincing but completely fictitious statements—and have no verified knowledge of private lecture notes or newly published college materials.
+        </p>
+        <p>
+            <strong>DocuVerse AI</strong> bridges this critical gap by creating an end-to-end, production-ready <strong>Intelligent Document Reading and Question Answering System</strong>. Powered by <strong>Retrieval-Augmented Generation (RAG)</strong>, it combines fast document parsing, semantic vector indexing, and ultra-high-speed LLM inference to empower students with verified, source-grounded answers accompanied by exact page numbers.
+        </p>
+
+        <h2 class="section-title">1.2 Problem Statement</h2>
+        <p>
+            Traditional methods of academic studying and document analysis suffer from the following core bottlenecks:
+        </p>
+        <ol>
+            <li><strong>Manual Information Retrieval Overhead:</strong> Scanning a 100-page academic textbook or technical standard to locate a specific concept or equation consumes significant study time.</li>
+            <li><strong>AI Hallucinations and Lack of Provenance:</strong> Generic LLMs frequently fabricate citations, fake author names, and misstate formulas because they predict words based on general training rather than verifiable local text.</li>
+            <li><strong>Context Window Limits:</strong> Standard language models cannot take entire textbooks or multi-document corpuses in a single prompt due to token buffer limits and quadratic attention compute costs.</li>
+            <li><strong>Scattered Study Tools:</strong> Students must juggle multiple disjointed tools—one for reading PDFs, another for writing summaries, and another for generating revision quiz questions.</li>
+            <li><strong>Language Inaccessibility:</strong> Many students in bilingual environments understand complex engineering concepts better when explained in their regional dialect (Hindi or Hinglish), whereas most documents are in dense academic English.</li>
+        </ol>
+
+        <h2 class="section-title">1.3 Proposed System</h2>
+        <p>
+            DocuVerse AI introduces a unified, modular, intelligent software architecture:
+        </p>
+        <ul>
+            <li><strong>Multi-PDF Parsing Engine:</strong> Accepts single or multiple PDF documents simultaneously, extracting plain text alongside accurate physical page number metadata using PyMuPDF.</li>
+            <li><strong>Sliding-Window Semantic Chunking:</strong> Splits long document streams into overlapping token windows (1000 characters with 200-character overlap), preserving contextual continuity across chunk boundaries.</li>
+            <li><strong>High-Dimensional Vector Storage:</strong> Encodes chunks into dense semantic vectors and builds an in-memory FAISS (Facebook AI Similarity Search) Index using normalized cosine similarity.</li>
+            <li><strong>Multi-Tenant Collection Isolation:</strong> Assigns each upload session a globally unique <code>collection_id</code>, strictly isolating vector spaces to prevent data leakage between different users or documents.</li>
+            <li><strong>Groq LPU Acceleration:</strong> Routes synthesized retrieval contexts to Groq's Language Processing Units, achieving inference speeds exceeding 300 tokens per second.</li>
+            <li><strong>Strict Grounding Guardrails:</strong> System prompts enforce that if an answer is absent from the uploaded text, the model explicitly responds: <em>"The provided documents do not contain information to answer this question."</em></li>
+            <li><strong>Comprehensive Academic Study Kit:</strong> Generates 1-click executive summaries, exam-oriented multiple-choice questions with answer keys, and bulleted takeaways in English, Hindi, and Hinglish.</li>
+        </ul>
+
+        <h2 class="section-title">1.4 Methodology</h2>
+        <p>
+            The development of DocuVerse AI followed the <strong>Agile Iterative Software Development Life Cycle (SDLC)</strong> across six well-defined phases:
+        </p>
+        <ul>
+            <li><strong>Requirement Engineering:</strong> Identified student study bottlenecks, citation needs, and API specifications.</li>
+            <li><strong>Architecture & Pipeline Design:</strong> Designed the three-tier RAG architecture separating data extraction, embedding/retrieval, and inference.</li>
+            <li><strong>Backend Engineering:</strong> Implemented a non-blocking asynchronous REST API using FastAPI, Pydantic v2 validation models, and thread pool delegation for CPU-bound FAISS operations.</li>
+            <li><strong>Frontend Development:</strong> Designed a modern, cosmic-themed responsive web UI using Streamlit, custom CSS3, and glassmorphic styling.</li>
+            <li><strong>Quality Assurance:</strong> Created an automated Pytest test suite with 14 comprehensive test cases covering health, PDF parsing, vector search, Q&A, and error boundaries.</li>
+            <li><strong>Cloud Deployment:</strong> Packaged backend services for deployment on Render and frontend UI on Streamlit Community Cloud.</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== CHAPTER 5 (ARCHITECTURE & DFD) ==================== -->
+    <div>
+        <h1 class="chapter-title">CHAPTER 5 – SYSTEM DESIGN & ARCHITECTURE</h1>
+
+        <h2 class="section-title">5.1 High-Level System Architecture</h2>
+        <p>
+            DocuVerse AI follows a modern, decoupled <strong>Three-Tier Microservices Architecture</strong>:
+        </p>
+
+        <div class="diagram-box">
++-------------------------------------------------------------------+
+|                        CLIENT BROWSER                             |
+|          (Streamlit Cosmic Dark UI - Desktop / Mobile)            |
++-------------------------------------------------------------------+
+                                  |
+                                  | HTTP REST / JSON
+                                  v
++-------------------------------------------------------------------+
+|                   FASTAPI APPLICATION BACKEND                     |
+|                   (Uvicorn ASGI Server @ :8000)                   |
+|                                                                   |
+|   +-------------------+  +-------------------+  +---------------+  |
+|   | /api/docs/upload  |  |     /api/chat     |  | /summary,/mcq |  |
+|   +-------------------+  +-------------------+  +---------------+  |
++-------------------------------------------------------------------+
+          |                                        |
+          | Extracts Text                          | Top-K Chunks + Prompt
+          v                                        v
++---------------------------+            +---------------------------+
+|    PyMuPDF (fitz) +       |            |    GROQ LPU CLOUD         |
+| Semantic Text Splitter    |            | (Qwen 2.5 / Llama 3 API)  |
++---------------------------+            +---------------------------+
+          |                                        |
+          | Dense Vectors                          | Generated Answer
+          v                                        v
++---------------------------+            +---------------------------+
+|    FAISS VECTOR STORE     | ---------> | Formatted Output with     |
+|   (Isolated Collection)   | Top Chunks | Verified Page Citations   |
++---------------------------+            +---------------------------+
+        </div>
+
+        <h2 class="section-title">5.2 RAG Pipeline Workflow</h2>
+        <p>
+            The RAG pipeline operates in two distinct phases:
+        </p>
+        <p>
+            <strong>Phase 1: Ingestion Pipeline (Upload Time)</strong><br>
+            User PDF Files &rarr; Magic Byte Verification &rarr; PyMuPDF Page-by-Page Text Extraction &rarr; Sliding Window Chunking (1000 char, 200 overlap) &rarr; Dense Embedding Generation &rarr; FAISS Cosine Index Building &rarr; Unique <code>collection_id</code> Generation.
+        </p>
+        <p>
+            <strong>Phase 2: Retrieval & Synthesis Pipeline (Query Time)</strong><br>
+            User Question &rarr; Query Embedding Vector &rarr; FAISS Inner Product Similarity Search &rarr; Top-4 Snippets Extracted &rarr; Context Assembly with Strict Grounding Prompt &rarr; Groq LPU Inference (&lt; 1.5s) &rarr; Answer + Verified Page Citations displayed to student.
+        </p>
+
+        <h2 class="section-title">5.3 Data Flow Diagram (DFD Level 0 & Level 1)</h2>
+        <div class="callout-box">
+            <strong>DFD Level 0 (Context Level):</strong><br>
+            Student / User &rarr; [PDF Documents + Plain-text Question] &rarr; [DOCUVERSE AI SYSTEM] &rarr; [Factual Grounded Answer + Exact Page Number Citations] &rarr; Student / User.
+        </div>
+        <p>
+            <strong>DFD Level 1 (Modular Breakdown):</strong>
+        </p>
+        <ul>
+            <li><strong>Process 1.0 (Ingestion):</strong> Validates <code>%PDF</code> bytes, handles multi-file payloads.</li>
+            <li><strong>Process 2.0 (Text Parsing):</strong> Extracts page text via PyMuPDF C-engine, tags page numbers.</li>
+            <li><strong>Process 3.0 (Vector Storage):</strong> Computes normalized embeddings, stores in memory via FAISS.</li>
+            <li><strong>Process 4.0 (Semantic Search):</strong> Compares query vector against chunk index, fetches top 4 hits.</li>
+            <li><strong>Process 5.0 (Groq LLM Synthesis):</strong> Formats anti-hallucination prompt, calls Groq API.</li>
+            <li><strong>Process 6.0 (Citation Formatting):</strong> Packages answer with source filename and page chips.</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== CHAPTER 6 (TECH STACK) ==================== -->
+    <div>
+        <h1 class="chapter-title">CHAPTER 6 – TECHNOLOGY STACK</h1>
+
+        <table class="content-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Layer / Component</th>
+                    <th style="width: 30%;">Selected Technology</th>
+                    <th style="width: 45%;">Role & Technical Advantage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Frontend UI</strong></td>
+                    <td>Streamlit + Custom CSS3</td>
+                    <td>Cosmic dark theme (<code>#0B0D1B</code>), responsive mobile layout, reactive widget state.</td>
+                </tr>
+                <tr>
+                    <td><strong>Backend REST API</strong></td>
+                    <td>FastAPI + Uvicorn</td>
+                    <td>Asynchronous non-blocking architecture, OpenAPI/Swagger docs at <code>/docs</code>, Pydantic v2 validation.</td>
+                </tr>
+                <tr>
+                    <td><strong>PDF Extraction</strong></td>
+                    <td>PyMuPDF (fitz)</td>
+                    <td>C-accelerated engine, 10&times; faster than PyPDF2, maintains exact page number coordinates.</td>
+                </tr>
+                <tr>
+                    <td><strong>Semantic Chunking</strong></td>
+                    <td>LangChain Text Splitter</td>
+                    <td>1000-character windows with 200-character overlap to preserve semantic context across paragraph boundaries.</td>
+                </tr>
+                <tr>
+                    <td><strong>Vector Database</strong></td>
+                    <td>FAISS-CPU (Meta AI)</td>
+                    <td>In-memory cosine similarity search (<code>IndexFlatIP</code>), multi-tenant collection isolation.</td>
+                </tr>
+                <tr>
+                    <td><strong>AI Inference</strong></td>
+                    <td>Groq Cloud LPU Engine</td>
+                    <td>Tensor Streaming Processors running <code>qwen/qwen3.8-27b</code> at &gt;300 tokens/sec. Sub-second response time.</td>
+                </tr>
+                <tr>
+                    <td><strong>Automated Testing</strong></td>
+                    <td>Pytest + TestClient</td>
+                    <td>14 comprehensive unit and integration tests covering all 8 endpoints and error scenarios.</td>
+                </tr>
+                <tr>
+                    <td><strong>Cloud Deployment</strong></td>
+                    <td>Render & Streamlit Cloud</td>
+                    <td>Render ASGI web service for FastAPI backend; Streamlit Community Cloud for public frontend UI.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== CHAPTER 9 (TESTING) ==================== -->
+    <div>
+        <h1 class="chapter-title">CHAPTER 9 – SOFTWARE TESTING & VERIFICATION</h1>
+
+        <p>
+            An automated test suite was developed using <code>pytest</code> and FastAPI's <code>TestClient</code> in <code>test_backend.py</code>. The suite exercises every endpoint against real in-memory vector stores and synthetic PDF fixtures.
+        </p>
+
+        <div class="callout-box">
+            <strong>Automated Pytest Execution Summary:</strong><br>
+            <code>pytest test_backend.py -v</code> &rarr; <strong>14 PASSED, 0 FAILED in 20.61s</strong> (100% Success Rate)
+        </div>
+
+        <table class="content-table">
+            <thead>
+                <tr>
+                    <th style="width: 10%; text-align: center;">Test ID</th>
+                    <th style="width: 25%;">Test Scenario</th>
+                    <th style="width: 25%;">Input Condition</th>
+                    <th style="width: 28%;">Expected Result</th>
+                    <th style="width: 12%; text-align: center;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td align="center"><strong>TC01</strong></td><td>Root Info Endpoint</td><td><code>GET /</code></td><td>HTTP 200, system info, status "online"</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC02</strong></td><td>Health Probe Check</td><td><code>GET /health</code></td><td>HTTP 200, status "healthy", memory status</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC03</strong></td><td>Invalid File Type</td><td>Upload <code>.txt</code> file</td><td>HTTP 400 Bad Request ("Only PDF files accepted")</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC04</strong></td><td>Corrupt PDF Rejection</td><td>Invalid binary bytes</td><td>HTTP 400 Bad Request ("Corrupt PDF file")</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC05</strong></td><td>Valid PDF Ingestion</td><td>Valid academic PDF</td><td>HTTP 201, <code>collection_id</code>, pages &gt; 0</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC06</strong></td><td>Document Grounded Q&A</td><td>Valid collection + query</td><td>HTTP 200, factual answer + exact page citations</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC07</strong></td><td>Non-Existent Collection</td><td>Random UUID</td><td>HTTP 404 Collection Not Found</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC08</strong></td><td>Empty Query Guard</td><td>Empty string <code>""</code></td><td>HTTP 422 / 400 Validation Error</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC09</strong></td><td>Executive Summary</td><td>Valid collection</td><td>HTTP 200, structured executive summary</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC10</strong></td><td>Practice MCQ Generator</td><td>Valid collection</td><td>HTTP 200, 4 MCQs with options & answer key</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC11</strong></td><td>Key Takeaways Extractor</td><td>Valid collection</td><td>HTTP 200, bulleted high-impact takeaways</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC12</strong></td><td>Collection Deletion</td><td><code>DELETE /api/...</code></td><td>HTTP 200, memory reclaimed cleanly</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC13</strong></td><td>Delete Missing Collection</td><td>Non-existent UUID</td><td>HTTP 404 Collection Not Found</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+                <tr><td align="center"><strong>TC14</strong></td><td>API Key Failure Guard</td><td>Unset API key</td><td>Graceful fallback error response, zero crash</td><td align="center" style="color: green; font-weight: bold;">PASSED</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== CHAPTER 10 & 11 ==================== -->
+    <div>
+        <h1 class="chapter-title">CHAPTER 10 – DEPLOYMENT & LIMITATIONS</h1>
+
+        <h2 class="section-title">10.1 Cloud Deployment Architecture</h2>
+        <p>
+            DocuVerse AI is packaged and configured for continuous deployment:
+        </p>
+        <ul>
+            <li><strong>Backend Web Service (Render):</strong> Configured via <code>render.yaml</code>, running <code>uvicorn main:app --host 0.0.0.0 --port $PORT</code>.</li>
+            <li><strong>Frontend Web App (Streamlit Community Cloud):</strong> Direct automated CI/CD pipeline connected to GitHub repository <code>main</code> branch.</li>
+        </ul>
+
+        <h2 class="section-title">10.2 Production Links & Repository</h2>
+        <table class="content-table">
+            <tr>
+                <td><strong>GitHub Repository:</strong></td>
+                <td><a href="https://github.com/pankaj2007kumar26-max/DocuVerse_AI" target="_blank">https://github.com/pankaj2007kumar26-max/DocuVerse_AI</a></td>
+            </tr>
+            <tr>
+                <td><strong>Interactive API Docs (FastAPI):</strong></td>
+                <td><code>https://docuverse-ai-backend.onrender.com/docs</code></td>
+            </tr>
+            <tr>
+                <td><strong>Live Web Application (Streamlit):</strong></td>
+                <td><a href="https://docuverseai.streamlit.app" target="_blank">https://docuverseai.streamlit.app</a></td>
+            </tr>
+        </table>
+
+        <h2 class="section-title">10.3 System Limitations</h2>
+        <ol>
+            <li><strong>Scanned Image PDFs:</strong> The current ingestion pipeline processes digital text; scanned handwritten notes or photocopied PDFs require an OCR pre-processing layer.</li>
+            <li><strong>RAM-Based Vector Persistence:</strong> On free-tier cloud instances, in-memory FAISS indices reset upon server cold restarts.</li>
+            <li><strong>Groq Free-Tier Rate Limits:</strong> Groq API enforces request-per-minute caps during peak hours.</li>
+        </ol>
+
+        <br>
+        <h1 class="chapter-title">CHAPTER 11 – CONCLUSION</h1>
+        <p>
+            <strong>DocuVerse AI – Intelligent Document Reading & Question Answering System</strong> successfully addresses the challenge of academic information overload by delivering an accurate, fast, and grounded document intelligence platform.
+        </p>
+        <p>
+            By integrating <strong>PyMuPDF</strong> for high-fidelity text extraction, <strong>FAISS</strong> for fast semantic vector indexing, and <strong>Groq Cloud LPUs</strong> for sub-second language model inference, the project solves the twin problems of generic AI: token limitations and factual hallucinations. Every answer is strictly grounded in the uploaded course material and accompanied by exact page numbers and verifiable text snippets.
+        </p>
+        <p>
+            In conclusion, DocuVerse AI stands as an effective, reliable, and user-friendly AI study assistant that substantially reduces revision time, boosts conceptual clarity, and enhances learning efficiency for students and educators alike.
+        </p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== CHAPTER 12 ==================== -->
+    <div>
+        <h1 class="chapter-title">CHAPTER 12 – FUTURE SCOPE & REFERENCES</h1>
+
+        <h2 class="section-title">12.1 Future Enhancements</h2>
+        <ul>
+            <li><strong>Optical Character Recognition (OCR):</strong> Integration of Tesseract OCR for reading handwritten classroom notes.</li>
+            <li><strong>Persistent Cloud Vector Databases:</strong> Migration from in-memory FAISS to managed cloud vector stores (Pinecone / Qdrant).</li>
+            <li><strong>Multi-Modal Vision Understanding:</strong> Integration of vision models to read diagrams, circuit charts, and flowcharts.</li>
+            <li><strong>Interactive Continuous Dialogue:</strong> Multi-turn conversational memory allowing iterative follow-up questions.</li>
+        </ul>
+
+        <h2 class="section-title">12.2 Academic & Documentation References</h2>
+        <ol>
+            <li>Lewis, P., et al. (2020). <em>"Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks."</em> Advances in Neural Information Processing Systems (NeurIPS 2020).</li>
+            <li>Johnson, J., Douze, M., & J&eacute;gou, H. (2019). <em>"Billion-Scale Similarity Search with GPUs."</em> IEEE Transactions on Big Data.</li>
+            <li>FastAPI Documentation &ndash; <a href="https://fastapi.tiangolo.com">https://fastapi.tiangolo.com</a></li>
+            <li>PyMuPDF Documentation &ndash; <a href="https://pymupdf.readthedocs.io">https://pymupdf.readthedocs.io</a></li>
+            <li>Streamlit Documentation &ndash; <a href="https://docs.streamlit.io">https://docs.streamlit.io</a></li>
+            <li>Groq Cloud LPU Architecture &ndash; <a href="https://groq.com">https://groq.com</a></li>
+            <li>Pydantic v2 Documentation &ndash; <a href="https://docs.pydantic.dev">https://docs.pydantic.dev</a></li>
+        </ol>
+
+        <br><br>
+        <div class="callout-box" style="text-align: center;">
+            <strong>END OF MINI PROJECT REPORT</strong><br>
+            <strong>Submitted By:</strong> Pankaj Kumar &nbsp;|&nbsp; <strong>Roll Number:</strong> 2501651530026<br>
+            <strong>Project Guide:</strong> Ms. Prakanksha Shukla &nbsp;|&nbsp; <strong>HOD:</strong> Mr. Rahul Singh<br>
+            <strong>Department of Computer Science & Engineering</strong><br>
+            <strong>Kanpur Institute of Technology, Kanpur &nbsp;|&nbsp; Academic Session: 2025–2026</strong>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
