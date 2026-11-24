@@ -6,8 +6,10 @@ embeddings ko memory ya disk par index karta hai aur user ke query se
 top-K sabse relevant document chunks ko retrieve karta hai.
 """
 
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 import os
+import time
+import threading
 import pickle
 import numpy as np
 import faiss
@@ -116,6 +118,104 @@ class FaissVectorStore:
             print(f"[Vector Store] Loaded {self.index.ntotal} chunks from '{directory}'")
             return True
         return False
+
+
+class DocumentCollection:
+    """
+    Ek isolated document collection jisme apna unique collection_id,
+    file names, total pages, full text, aur dedicated FaissVectorStore hota hai.
+    """
+    def __init__(
+        self,
+        collection_id: str,
+        file_names: List[str],
+        total_pages: int,
+        full_text: str,
+        vector_store: FaissVectorStore
+    ):
+        self.collection_id = collection_id
+        self.file_names = file_names
+        self.total_pages = total_pages
+        self.total_chunks = len(vector_store.chunks)
+        self.full_text = full_text
+        self.vector_store = vector_store
+        self.created_at = time.time()
+
+
+class CollectionManager:
+    """
+    Thread-safe manager jo multiple document collections ke FAISS indexes
+    ko completely isolated rakhta hai. Different users ya documents mix nahi hote.
+    """
+    def __init__(self):
+        self._collections: Dict[str, DocumentCollection] = {}
+        self._lock = threading.Lock()
+
+    def create_collection(
+        self,
+        collection_id: str,
+        file_names: List[str],
+        total_pages: int,
+        full_text: str,
+        chunks: List[Dict[str, Any]]
+    ) -> DocumentCollection:
+        """Nayi collection banakar uske liye dedicated FAISS index generate karta hai."""
+        store = FaissVectorStore()
+        store.add_chunks(chunks)
+        collection = DocumentCollection(
+            collection_id=collection_id,
+            file_names=file_names,
+            total_pages=total_pages,
+            full_text=full_text,
+            vector_store=store
+        )
+        with self._lock:
+            self._collections[collection_id] = collection
+        return collection
+
+    def get_collection(self, collection_id: str) -> Optional[DocumentCollection]:
+        """Collection fetch karta hai by ID."""
+        with self._lock:
+            return self._collections.get(collection_id)
+
+    def delete_collection(self, collection_id: str) -> bool:
+        """Collection aur uske FAISS index ko memory se completely wipe karta hai."""
+        with self._lock:
+            if collection_id in self._collections:
+                coll = self._collections.pop(collection_id)
+                coll.vector_store.clear()
+                return True
+            return False
+
+    def list_collections(self) -> List[Dict[str, Any]]:
+        """Active collections ki summary return karta hai."""
+        with self._lock:
+            return [
+                {
+                    "collection_id": c.collection_id,
+                    "file_names": c.file_names,
+                    "total_pages": c.total_pages,
+                    "total_chunks": c.total_chunks,
+                    "created_at": c.created_at
+                }
+                for c in self._collections.values()
+            ]
+
+    def count(self) -> int:
+        """Total active collections return karta hai."""
+        with self._lock:
+            return len(self._collections)
+
+
+# Global Singleton CollectionManager instance
+_collection_manager_instance = None
+
+def get_collection_manager() -> CollectionManager:
+    """Singleton instance of CollectionManager return karta hai."""
+    global _collection_manager_instance
+    if _collection_manager_instance is None:
+        _collection_manager_instance = CollectionManager()
+    return _collection_manager_instance
 
 
 if __name__ == "__main__":

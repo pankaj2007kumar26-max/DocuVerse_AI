@@ -64,7 +64,10 @@ class EmbeddingsManager:
                     self.model = SentenceTransformer(self.model_name)
                 else:
                     self.model = SentenceTransformer(self.model_name, local_files_only=True)
-                self.dimension = self.model.get_sentence_embedding_dimension()
+                if hasattr(self.model, "get_embedding_dimension"):
+                    self.dimension = self.model.get_embedding_dimension()
+                else:
+                    self.dimension = self.model.get_sentence_embedding_dimension()
                 self.backend = "sentence_transformers"
                 print(f"[Embeddings] SentenceTransformer ready! Vector Dimension: {self.dimension}")
                 return

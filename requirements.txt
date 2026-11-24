@@ -1,6 +1,16 @@
 # ==========================================
-# DocuVerse AI - Dependencies
+# DocuVerse AI - Production Dependencies
 # ==========================================
+
+# FastAPI Backend & Server
+fastapi>=0.110.0
+uvicorn>=0.29.0
+pydantic>=2.7.0
+python-multipart>=0.0.9
+
+# HTTP REST Client for Groq API & Frontend Backend Communication
+requests>=2.31.0
+httpx>=0.27.0
 
 # Modern Web UI Framework
 streamlit>=1.35.0
@@ -11,11 +21,11 @@ PyMuPDF>=1.24.0
 # FAISS (Facebook AI Similarity Search) - CPU Version
 faiss-cpu>=1.8.0
 
-# HTTP REST Client for Groq API
-requests>=2.31.0
-
 # Secure Environment Variables (.env file reader)
 python-dotenv>=1.0.1
 
 # Numerical computations for vector normalization
 numpy>=1.24.0
+
+# Automated Testing
+pytest>=8.0.0

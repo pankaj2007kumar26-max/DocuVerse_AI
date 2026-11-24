@@ -1,0 +1,27 @@
+# ==============================================================================
+# Render Blueprint Configuration (render.yaml)
+# ==============================================================================
+# Deploy DocuVerse AI FastAPI Backend directly on Render with zero-configuration:
+# 1. Connect GitHub repo: https://github.com/pankaj2007kumar26-max/DocuVerseAI
+# 2. Select Blueprint or Web Service
+# 3. Add your secret GROQ_API_KEY in the Environment variables
+# ==============================================================================
+
+services:
+  - type: web
+    name: docuverse-api
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: MAX_FILE_SIZE_MB
+        value: "15"
