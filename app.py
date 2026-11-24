@@ -67,14 +67,15 @@ st.markdown("""
     /* Streamlit Default Header Fix (Prevent cutting off custom header) */
     header[data-testid="stHeader"] {
         background: transparent !important;
+        height: 2.2rem !important;
         z-index: 10 !important;
     }
     
-    /* Central Responsive Container with Generous Top Clearance */
+    /* Central Responsive Container - Tight & Clean Top Spacing */
     .block-container {
         max-width: 1060px !important;
-        padding-top: clamp(5.5rem, 8vw, 6.8rem) !important;
-        padding-bottom: 3rem !important;
+        padding-top: 2.4rem !important;
+        padding-bottom: 2.5rem !important;
         padding-left: clamp(1rem, 3vw, 2.5rem) !important;
         padding-right: clamp(1rem, 3vw, 2.5rem) !important;
         margin: 0 auto !important;
@@ -87,8 +88,8 @@ st.markdown("""
         align-items: center;
         flex-wrap: wrap;
         gap: 12px;
-        margin-top: 10px;
-        padding: 5px 0 25px 0;
+        margin-top: 0px !important;
+        padding: 0px 0 20px 0 !important;
     }
     .brand-title {
         font-size: clamp(1.15rem, 3vw, 1.4rem);
@@ -302,7 +303,7 @@ st.markdown("""
     
     @media screen and (max-width: 768px) {
         .block-container {
-            padding-top: 5.5rem !important;
+            padding-top: 2.6rem !important;
             padding-left: 0.8rem !important;
             padding-right: 0.8rem !important;
         }
