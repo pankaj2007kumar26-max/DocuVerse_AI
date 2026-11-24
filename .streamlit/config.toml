@@ -9,5 +9,5 @@ baseRadius = "12px"
 buttonRadius = "10px"
 showWidgetBorder = true
 showSidebarBorder = true
-paddingTop = "0rem"
-paddingBottom = "1rem"
+paddingTop = "3.5rem"
+paddingBottom = "2rem"

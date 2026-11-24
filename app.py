@@ -46,10 +46,17 @@ st.markdown("""
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Central Responsive Container */
+    /* Streamlit Default Header Fix (Prevent cutting off custom header) */
+    header[data-testid="stHeader"] {
+        background: rgba(11, 13, 27, 0.85) !important;
+        backdrop-filter: blur(10px) !important;
+        z-index: 100 !important;
+    }
+    
+    /* Central Responsive Container with Generous Top Clearance */
     .block-container {
         max-width: 1060px !important;
-        padding-top: 1.2rem !important;
+        padding-top: clamp(4rem, 6vw, 5.2rem) !important;
         padding-bottom: 3rem !important;
         padding-left: clamp(1rem, 3vw, 2.5rem) !important;
         padding-right: clamp(1rem, 3vw, 2.5rem) !important;
@@ -63,7 +70,8 @@ st.markdown("""
         align-items: center;
         flex-wrap: wrap;
         gap: 12px;
-        padding: 5px 0 20px 0;
+        margin-top: 10px;
+        padding: 5px 0 25px 0;
     }
     .brand-title {
         font-size: clamp(1.15rem, 3vw, 1.4rem);
@@ -277,6 +285,7 @@ st.markdown("""
     
     @media screen and (max-width: 768px) {
         .block-container {
+            padding-top: 4.5rem !important;
             padding-left: 0.8rem !important;
             padding-right: 0.8rem !important;
         }
