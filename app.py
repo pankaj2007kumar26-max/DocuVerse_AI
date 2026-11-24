@@ -1,19 +1,27 @@
 """
-DocuVerse AI - Frontend Application (app.py)
-============================================
-FastAPI-Connected Streamlit Frontend with Responsive Cosmic Dark Theme.
-Communicates strictly via REST API with the FastAPI backend.
+DocuVerse AI - Smart Hybrid Frontend (app.py)
+==============================================
+Zero-Config, Self-Healing Streamlit Application with Responsive Cosmic Dark Theme:
+- Auto-Detects FastAPI Backend: If backend is online, uses REST API.
+- Intelligent Fallback: If backend is offline or waking up, executes seamless in-memory RAG.
+- Works 100% out-of-the-box on Streamlit Cloud without manual secrets configuration!
 """
 
 import os
 import requests
 import streamlit as st
 
+import config
+from pdf_reader import extract_text_from_pdf
+from text_splitter import chunk_documents
+from vector_store import FaissVectorStore
+import api_handler
+
 # --------------------------------------------------------------------
-# 1. BACKEND URL CONFIGURATION
+# 1. BACKEND URL AUTO-DETECTION
 # --------------------------------------------------------------------
 def get_backend_url() -> str:
-    """Fetches configured backend URL from env, Streamlit secrets, or defaults to localhost."""
+    """Fetches configured backend URL from env, Streamlit secrets, or defaults."""
     url = os.getenv("BACKEND_URL", "").strip()
     if not url:
         try:
@@ -26,6 +34,16 @@ def get_backend_url() -> str:
     return url.rstrip("/")
 
 BACKEND_URL = get_backend_url()
+
+
+def is_backend_online() -> bool:
+    """Quick 1-second ping to check if FastAPI backend is live."""
+    try:
+        r = requests.get(f"{BACKEND_URL}/health", timeout=1.2)
+        return r.status_code == 200
+    except Exception:
+        return False
+
 
 # --------------------------------------------------------------------
 # 2. PAGE SETUP & EXACT RESPONSIVE THEME
@@ -48,15 +66,14 @@ st.markdown("""
     
     /* Streamlit Default Header Fix (Prevent cutting off custom header) */
     header[data-testid="stHeader"] {
-        background: rgba(11, 13, 27, 0.85) !important;
-        backdrop-filter: blur(10px) !important;
-        z-index: 100 !important;
+        background: transparent !important;
+        z-index: 10 !important;
     }
     
     /* Central Responsive Container with Generous Top Clearance */
     .block-container {
         max-width: 1060px !important;
-        padding-top: clamp(4rem, 6vw, 5.2rem) !important;
+        padding-top: clamp(5.5rem, 8vw, 6.8rem) !important;
         padding-bottom: 3rem !important;
         padding-left: clamp(1rem, 3vw, 2.5rem) !important;
         padding-right: clamp(1rem, 3vw, 2.5rem) !important;
@@ -285,7 +302,7 @@ st.markdown("""
     
     @media screen and (max-width: 768px) {
         .block-container {
-            padding-top: 4.5rem !important;
+            padding-top: 5.5rem !important;
             padding-left: 0.8rem !important;
             padding-right: 0.8rem !important;
         }
@@ -318,6 +335,9 @@ st.markdown("""
 if "collection_id" not in st.session_state:
     st.session_state.collection_id = None
 
+if "local_vector_store" not in st.session_state:
+    st.session_state.local_vector_store = FaissVectorStore()
+
 if "processed_files" not in st.session_state:
     st.session_state.processed_files = []
 
@@ -326,6 +346,9 @@ if "total_pages" not in st.session_state:
 
 if "total_chunks" not in st.session_state:
     st.session_state.total_chunks = 0
+
+if "full_text" not in st.session_state:
+    st.session_state.full_text = ""
 
 if "last_answer" not in st.session_state:
     st.session_state.last_answer = None
@@ -341,108 +364,7 @@ if "model_used" not in st.session_state:
 
 
 # --------------------------------------------------------------------
-# 4. BACKEND API CLIENT CALLS
-# --------------------------------------------------------------------
-def check_backend_health() -> bool:
-    """Verifies that FastAPI backend is reachable and healthy."""
-    try:
-        res = requests.get(f"{BACKEND_URL}/health", timeout=3)
-        return res.status_code == 200
-    except Exception:
-        return False
-
-def upload_pdfs_to_backend(uploaded_files):
-    """Uploads PDF files to FastAPI backend /api/documents/upload."""
-    files_payload = []
-    for f in uploaded_files:
-        files_payload.append(("files", (f.name, f.getvalue(), "application/pdf")))
-    
-    try:
-        response = requests.post(
-            f"{BACKEND_URL}/api/documents/upload",
-            files=files_payload,
-            timeout=90
-        )
-        if response.status_code == 201:
-            return True, response.json()
-        else:
-            err = response.json().get("detail", response.text)
-            return False, err
-    except requests.exceptions.RequestException as e:
-        return False, f"Could not connect to FastAPI backend at {BACKEND_URL}: {str(e)}"
-
-def send_chat_to_backend(collection_id: str, question: str, language: str):
-    """Sends question to FastAPI backend /api/chat."""
-    payload = {
-        "collection_id": collection_id,
-        "question": question,
-        "language": language
-    }
-    try:
-        response = requests.post(f"{BACKEND_URL}/api/chat", json=payload, timeout=60)
-        if response.status_code == 200:
-            return True, response.json()
-        else:
-            return False, response.json().get("detail", response.text)
-    except requests.exceptions.RequestException as e:
-        return False, f"Backend connection error: {str(e)}"
-
-def get_summary_from_backend(collection_id: str, language: str):
-    """Fetches summary from FastAPI backend /api/documents/{id}/summary."""
-    try:
-        response = requests.post(
-            f"{BACKEND_URL}/api/documents/{collection_id}/summary",
-            json={"language": language},
-            timeout=60
-        )
-        if response.status_code == 200:
-            return True, response.json()
-        else:
-            return False, response.json().get("detail", response.text)
-    except requests.exceptions.RequestException as e:
-        return False, f"Backend connection error: {str(e)}"
-
-def get_mcqs_from_backend(collection_id: str, num_questions: int = 4):
-    """Fetches practice MCQs from FastAPI backend /api/documents/{id}/mcqs."""
-    try:
-        response = requests.post(
-            f"{BACKEND_URL}/api/documents/{collection_id}/mcqs",
-            json={"num_questions": num_questions},
-            timeout=60
-        )
-        if response.status_code == 200:
-            return True, response.json()
-        else:
-            return False, response.json().get("detail", response.text)
-    except requests.exceptions.RequestException as e:
-        return False, f"Backend connection error: {str(e)}"
-
-def get_key_points_from_backend(collection_id: str, language: str):
-    """Fetches key points from FastAPI backend /api/documents/{id}/key-points."""
-    try:
-        response = requests.post(
-            f"{BACKEND_URL}/api/documents/{collection_id}/key-points",
-            json={"language": language},
-            timeout=60
-        )
-        if response.status_code == 200:
-            return True, response.json()
-        else:
-            return False, response.json().get("detail", response.text)
-    except requests.exceptions.RequestException as e:
-        return False, f"Backend connection error: {str(e)}"
-
-def delete_collection_from_backend(collection_id: str):
-    """Deletes collection on FastAPI backend."""
-    try:
-        response = requests.delete(f"{BACKEND_URL}/api/documents/{collection_id}", timeout=10)
-        return response.status_code == 200
-    except Exception:
-        return False
-
-
-# --------------------------------------------------------------------
-# 5. TOP NAVIGATION BAR & HERO HEADER
+# 4. TOP NAVIGATION BAR & HERO HEADER
 # --------------------------------------------------------------------
 st.markdown("""
 <div class="top-bar">
@@ -463,7 +385,7 @@ st.markdown("""
 
 
 # --------------------------------------------------------------------
-# 6. CARD 1: UPLOAD PDF FILE
+# 5. CARD 1: UPLOAD PDF FILE
 # --------------------------------------------------------------------
 st.markdown("""
 <div class="step-header-row">
@@ -534,12 +456,12 @@ with col_res:
 
 # Reset Logic
 if reset_btn:
-    if st.session_state.collection_id:
-        delete_collection_from_backend(st.session_state.collection_id)
+    st.session_state.local_vector_store.clear()
     st.session_state.collection_id = None
     st.session_state.processed_files = []
     st.session_state.total_pages = 0
     st.session_state.total_chunks = 0
+    st.session_state.full_text = ""
     st.session_state.last_answer = None
     st.session_state.last_sources = []
     st.session_state.last_query = ""
@@ -547,25 +469,60 @@ if reset_btn:
     st.success("Documents reset successfully!")
     st.rerun()
 
-# Processing Logic via FastAPI Backend
+# Processing Logic (Auto-Detect Backend vs Direct Engine)
 if process_btn:
     if not uploaded_files:
         st.warning("⚠️ Kripya pehle kam se kam ek PDF file select kijiye.")
     else:
-        with st.spinner("📄 Uploading and indexing via FastAPI backend..."):
-            success, data = upload_pdfs_to_backend(uploaded_files)
-            if success:
-                st.session_state.collection_id = data["collection_id"]
-                st.session_state.processed_files = data["file_names"]
-                st.session_state.total_pages = data["total_pages"]
-                st.session_state.total_chunks = data["total_chunks"]
-                st.session_state.last_answer = None
-                st.rerun()
-            else:
-                st.error(f"Upload failed: {data}")
+        backend_active = is_backend_online()
+        processed_successfully = False
+        
+        # 1. Try FastAPI Backend if live
+        if backend_active:
+            try:
+                with st.spinner("📄 Uploading and indexing via FastAPI backend..."):
+                    files_payload = [("files", (f.name, f.getvalue(), "application/pdf")) for f in uploaded_files]
+                    res = requests.post(f"{BACKEND_URL}/api/documents/upload", files=files_payload, timeout=60)
+                    if res.status_code == 201:
+                        data = res.json()
+                        st.session_state.collection_id = data["collection_id"]
+                        st.session_state.processed_files = data["file_names"]
+                        st.session_state.total_pages = data["total_pages"]
+                        st.session_state.total_chunks = data["total_chunks"]
+                        st.session_state.last_answer = None
+                        processed_successfully = True
+                        st.rerun()
+            except Exception:
+                processed_successfully = False
+
+        # 2. Seamless Direct Execution if backend not reachable (Zero-configuration fallback!)
+        if not processed_successfully:
+            with st.spinner("📄 Reading PDF pages and building FAISS semantic index..."):
+                all_pages = []
+                text_collector = []
+                for file in uploaded_files:
+                    pages = extract_text_from_pdf(file, file_name=file.name)
+                    all_pages.extend(pages)
+                    for p in pages:
+                        text_collector.append(f"--- Document: {file.name} | Page {p['metadata']['page']} ---\n" + p["text"])
+
+                if not all_pages:
+                    st.error("Uploaded PDFs se koi readable text extract nahi ho saka.")
+                else:
+                    chunks = chunk_documents(all_pages, chunk_size=config.CHUNK_SIZE, chunk_overlap=config.CHUNK_OVERLAP)
+                    st.session_state.local_vector_store.clear()
+                    total_indexed = st.session_state.local_vector_store.add_chunks(chunks)
+
+                    st.session_state.collection_id = "local_active"
+                    st.session_state.processed_files = [f.name for f in uploaded_files]
+                    st.session_state.total_pages = len(all_pages)
+                    st.session_state.total_chunks = total_indexed
+                    st.session_state.full_text = "\n\n".join(text_collector)
+                    st.session_state.last_answer = None
+                    st.rerun()
 
 # Success Status Pill
-if st.session_state.collection_id and st.session_state.processed_files:
+if st.session_state.processed_files:
     file_names_str = ", ".join(st.session_state.processed_files)
     st.markdown(f"""
     <div class="status-pill-ready">
@@ -578,7 +535,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 
 # --------------------------------------------------------------------
-# 7. CARD 2: ASK YOUR QUESTION
+# 6. CARD 2: ASK YOUR QUESTION
 # --------------------------------------------------------------------
 st.markdown("""
 <div class="step-header-row">
@@ -627,73 +584,84 @@ with row2_col_right:
 
 
 # --------------------------------------------------------------------
-# 8. ACTION HANDLERS (Invoking FastAPI Backend)
+# 7. ACTION HANDLERS (Auto-Detect Backend vs Direct Groq Engine)
 # --------------------------------------------------------------------
 if get_answer_btn:
-    if not st.session_state.collection_id:
+    if not st.session_state.processed_files or st.session_state.total_chunks == 0:
         st.warning("⚠️ Kripya pehle upar Step 1 mein PDF upload aur process karein!")
     elif not user_question.strip():
         st.warning("⚠️ Kripya question box mein kuch type kijiye.")
     else:
-        with st.spinner("🔍 Querying FastAPI backend and generating answer..."):
-            success, res = send_chat_to_backend(
-                collection_id=st.session_state.collection_id,
-                question=user_question,
-                language=selected_language
-            )
-            if success:
+        answered = False
+        # Try backend if available and collection is backend-hosted
+        if is_backend_online() and st.session_state.collection_id and st.session_state.collection_id != "local_active":
+            try:
+                with st.spinner("🔍 Querying FastAPI backend and generating answer..."):
+                    payload = {"collection_id": st.session_state.collection_id, "question": user_question, "language": selected_language}
+                    r = requests.post(f"{BACKEND_URL}/api/chat", json=payload, timeout=60)
+                    if r.status_code == 200:
+                        data = r.json()
+                        st.session_state.last_answer = data.get("answer", "")
+                        st.session_state.last_sources = data.get("sources", [])
+                        st.session_state.last_query = user_question
+                        st.session_state.model_used = data.get("model_used")
+                        answered = True
+            except Exception:
+                answered = False
+        
+        # Fallback to direct execution
+        if not answered:
+            with st.spinner("🔍 Searching FAISS index and generating factual answer with Groq LPU..."):
+                relevant_chunks = st.session_state.local_vector_store.search(
+                    query=user_question,
+                    top_k=config.TOP_K_RESULTS
+                )
+                res = api_handler.generate_rag_answer(
+                    query=user_question,
+                    context_chunks=relevant_chunks,
+                    language=selected_language
+                )
                 st.session_state.last_answer = res.get("answer", "No answer generated.")
                 st.session_state.last_sources = res.get("sources", [])
                 st.session_state.last_query = user_question
                 st.session_state.model_used = res.get("model_used")
-            else:
-                st.error(f"Chat error: {res}")
 
 if summary_btn:
-    if not st.session_state.collection_id:
+    if not st.session_state.processed_files:
         st.warning("⚠️ Pehle PDF upload aur process kijiye.")
     else:
-        with st.spinner("📝 Generating Executive Summary via backend..."):
-            success, res = get_summary_from_backend(st.session_state.collection_id, language=selected_language)
-            if success:
-                st.session_state.last_answer = res.get("summary", "Summary could not be generated.")
-                st.session_state.last_sources = []
-                st.session_state.last_query = "Document Executive Summary"
-                st.session_state.model_used = res.get("model_used")
-            else:
-                st.error(f"Summary error: {res}")
+        with st.spinner("📝 Generating Executive Summary with Groq..."):
+            res = api_handler.generate_document_summary(st.session_state.full_text, language=selected_language)
+            st.session_state.last_answer = res.get("summary", "Summary could not be generated.")
+            st.session_state.last_sources = []
+            st.session_state.last_query = "Document Executive Summary"
+            st.session_state.model_used = res.get("model_used")
 
 if mcq_btn:
-    if not st.session_state.collection_id:
+    if not st.session_state.processed_files:
         st.warning("⚠️ Pehle PDF upload aur process kijiye.")
     else:
-        with st.spinner("🎯 Generating Practice MCQs via backend..."):
-            success, res = get_mcqs_from_backend(st.session_state.collection_id, num_questions=4)
-            if success:
-                st.session_state.last_answer = res.get("mcqs", "MCQs could not be generated.")
-                st.session_state.last_sources = []
-                st.session_state.last_query = "Document Practice MCQs"
-                st.session_state.model_used = res.get("model_used")
-            else:
-                st.error(f"MCQ error: {res}")
+        with st.spinner("🎯 Generating Practice MCQs with Groq..."):
+            res = api_handler.generate_document_mcqs(st.session_state.full_text, num_questions=4)
+            st.session_state.last_answer = res.get("mcqs", "MCQs could not be generated.")
+            st.session_state.last_sources = []
+            st.session_state.last_query = "Document Practice MCQs"
+            st.session_state.model_used = res.get("model_used")
 
 if key_points_btn:
-    if not st.session_state.collection_id:
+    if not st.session_state.processed_files:
         st.warning("⚠️ Pehle PDF upload aur process kijiye.")
     else:
-        with st.spinner("⭐ Extracting Key Points via backend..."):
-            success, res = get_key_points_from_backend(st.session_state.collection_id, language=selected_language)
-            if success:
-                st.session_state.last_answer = res.get("key_points", "Key points could not be generated.")
-                st.session_state.last_sources = []
-                st.session_state.last_query = "Key Points & Main Takeaways"
-                st.session_state.model_used = res.get("model_used")
-            else:
-                st.error(f"Key Points error: {res}")
+        with st.spinner("⭐ Extracting Key Points with Groq..."):
+            res = api_handler.generate_document_key_points(st.session_state.full_text, language=selected_language)
+            st.session_state.last_answer = res.get("key_points", "Key points could not be generated.")
+            st.session_state.last_sources = []
+            st.session_state.last_query = "Key Points & Main Takeaways"
+            st.session_state.model_used = res.get("model_used")
 
 
 # --------------------------------------------------------------------
-# 9. CARD 3: OUTPUT AREA (Adaptive Result Display)
+# 8. CARD 3: OUTPUT AREA (Adaptive Result Display)
 # --------------------------------------------------------------------
 if st.session_state.last_answer:
     st.markdown("<br>", unsafe_allow_html=True)
@@ -724,10 +692,10 @@ if st.session_state.last_answer:
 
 
 # --------------------------------------------------------------------
-# 10. FOOTER
+# 9. FOOTER
 # --------------------------------------------------------------------
 st.markdown("""
 <div class="app-footer">
-    ✨ Study Smarter • Learn Better • Achieve More &nbsp;|&nbsp; Connected to FastAPI Backend
+    ✨ Study Smarter • Learn Better • Achieve More &nbsp;|&nbsp; Powered by Groq LPU
 </div>
 """, unsafe_allow_html=True)
