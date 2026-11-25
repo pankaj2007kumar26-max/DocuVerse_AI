@@ -363,9 +363,43 @@ if "last_query" not in st.session_state:
 if "model_used" not in st.session_state:
     st.session_state.model_used = None
 
+if "groq_api_key" not in st.session_state:
+    st.session_state.groq_api_key = getattr(config, "GROQ_API_KEY", "")
+
+# Synchronize config with session state
+if st.session_state.groq_api_key:
+    config.GROQ_API_KEY = st.session_state.groq_api_key
+
 
 # --------------------------------------------------------------------
-# 4. TOP NAVIGATION BAR & HERO HEADER
+# 4. SIDEBAR SETTINGS (Collapsible)
+# --------------------------------------------------------------------
+with st.sidebar:
+    st.markdown("### ⚙️ DocuVerse AI Settings")
+    if config.is_groq_api_key_valid():
+        masked = config.GROQ_API_KEY[:7] + "..." + config.GROQ_API_KEY[-4:]
+        st.success(f"🟢 **Groq API:** Connected (`{masked}`)")
+    else:
+        st.error("🔴 **Groq API:** Disconnected")
+    
+    sidebar_key = st.text_input("Custom Groq API Key:", type="password", placeholder="gsk_...", key="sidebar_key_input")
+    if st.button("Update Key", key="sidebar_key_btn", use_container_width=True):
+        if sidebar_key.strip().startswith("gsk_"):
+            st.session_state.groq_api_key = sidebar_key.strip()
+            config.GROQ_API_KEY = sidebar_key.strip()
+            st.success("✔ API Key updated successfully!")
+            st.rerun()
+        else:
+            st.warning("Key must start with 'gsk_'.")
+            
+    st.markdown("---")
+    st.markdown("📖 **Model:** `qwen/qwen3.8-27b`")
+    st.markdown("⚡ **Inference:** Groq Cloud LPU")
+    st.markdown("🎓 **Project:** B.Tech CSE Mini Project")
+
+
+# --------------------------------------------------------------------
+# 5. TOP NAVIGATION BAR & HERO HEADER
 # --------------------------------------------------------------------
 st.markdown("""
 <div class="top-bar">
@@ -383,6 +417,42 @@ st.markdown("""
     <div class="hero-subtitle">Get instant answers from your documents with AI ✨</div>
 </div>
 """, unsafe_allow_html=True)
+
+# Interactive In-App Key Input (Shown only if no key is configured in .env or st.secrets)
+if not config.is_groq_api_key_valid():
+    st.markdown("""
+    <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 14px; padding: 16px 20px; margin-bottom: 20px;">
+        <div style="color: #F87171; font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <span>🔑</span> <span>Groq API Key Required</span>
+        </div>
+        <div style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.5; margin-bottom: 12px;">
+            Streamlit Cloud par AI answers aur study helpers chalane ke liye apni Groq API Key yaha paste kijiye:
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col_k_input, col_k_btn = st.columns([3.2, 1.1])
+    with col_k_input:
+        entered_key = st.text_input(
+            "Enter Groq API Key",
+            type="password",
+            placeholder="Paste your key here (gsk_...)",
+            label_visibility="collapsed",
+            key="ui_groq_key_input"
+        )
+    with col_k_btn:
+        connect_btn = st.button("⚡ Connect Key", type="primary", use_container_width=True)
+    
+    if connect_btn and entered_key:
+        cleaned_key = entered_key.strip()
+        if cleaned_key.startswith("gsk_"):
+            st.session_state.groq_api_key = cleaned_key
+            config.GROQ_API_KEY = cleaned_key
+            st.success("✔ Groq API Key successfully connected! Ab aap answer generate kar sakte hain.")
+            st.rerun()
+        else:
+            st.error("⚠️ Invalid key format. Key must start with 'gsk_'.")
+    st.write("")
 
 
 # --------------------------------------------------------------------

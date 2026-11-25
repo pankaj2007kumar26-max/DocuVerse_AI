@@ -40,11 +40,21 @@ def call_groq(
     """
     api_key = getattr(config, "GROQ_API_KEY", "").strip()
     if not api_key:
+        try:
+            import streamlit as st
+            if hasattr(st, "session_state") and "groq_api_key" in st.session_state:
+                if st.session_state.groq_api_key:
+                    api_key = str(st.session_state.groq_api_key).strip()
+                    config.GROQ_API_KEY = api_key
+        except Exception:
+            pass
+
+    if not api_key:
         return {
             "text": "",
             "model_used": None,
             "success": False,
-            "error": "GROQ_API_KEY `.env` file mein nahi mili. Kripya check karein."
+            "error": "GROQ_API_KEY nahi mili. Kripya screen par upar 'Connect Groq API Key' box mein apni key paste karein ya Streamlit Cloud Secrets mein GROQ_API_KEY set karein."
         }
 
     headers = {
